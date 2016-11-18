@@ -2,16 +2,12 @@ package rentalcars;
 
 
 
-import java.io.File;
-import java.io.IOException;
-import java.util.Scanner;
-
-
-
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.net.URL;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-
 import com.google.gson.Gson;
 
 
@@ -19,9 +15,6 @@ import com.google.gson.Gson;
 
 
 public class RentalCars {
-
-	private static String jsonFile = "C:/Users/dan/Documents/rental.txt";
-	
 	private static String type(String s){
 		String[] type = {"Mini", "Eonomy", "Compact", "Intermediate", "Standard", "Full size", "Premium", "Luxury", "Special"};
 		
@@ -107,24 +100,35 @@ public class RentalCars {
 		}else {
 			return 7;
 		}
-	
-      
-		
-		
 			
 	}
+	
+	private static String readUrl(String urlString) throws Exception {
+	    BufferedReader reader = null;
+	    try {
+	        URL url = new URL(urlString);
+	        reader = new BufferedReader(new InputStreamReader(url.openStream()));
+	        StringBuffer buffer = new StringBuffer();
+	        int read;
+	        char[] chars = new char[1024];
+	        while ((read = reader.read(chars)) != -1)
+	            buffer.append(chars, 0, read); 
 
-	public static void main(String[] args) {
+	        return buffer.toString();
+	    } finally {
+	        if (reader != null)
+	            reader.close();
+	    }
+	}
+
+	public static void main(String[] args)  {
 		
 
 		 Gson gson = new Gson();
 
 		    try {
 
-		        Scanner scanner = new Scanner( new File("C:/Users/dan/Documents/rental.txt") );
-		        String text = scanner.useDelimiter("\\A").next();
-		        
-		        scanner.close();
+		    	 String text = readUrl("http://www.rentalcars.com/js/vehicles.json");
                 JsonObject result = gson.fromJson(text,JsonElement.class).getAsJsonObject();
 		        
                 JsonElement parent = (JsonElement) result.get("Search");
@@ -171,7 +175,7 @@ public class RentalCars {
                 }
                 
 
-		    } catch (IOException e) {
+		    } catch (Exception e) {
 		        e.printStackTrace();
 		    }
 	}
